@@ -127,7 +127,7 @@ module Treetop
           end
         }
         /
-	prefix space? predicate_block {
+        prefix space? predicate_block {
           def compile(address, builder, parent_expression=nil)
             prefix.compile(address, builder, self)
           end
@@ -305,11 +305,29 @@ module Treetop
       end
 
       rule atomic
+        regex
+        /
         terminal
         /
         nonterminal
         /
         parenthesized_expression
+      end
+      
+      rule regex
+        'r(' regex_body ')' <Regex> {
+          def inline_modules
+            []
+          end
+        }
+      end
+      
+      rule regex_body
+        (nested_parens_in_regex / [^)])*
+      end
+      
+      rule nested_parens_in_regex
+        '(' regex_body ')'
       end
 
       rule parenthesized_expression

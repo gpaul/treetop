@@ -94,6 +94,15 @@ module Treetop
           input[index, terminal.size] == terminal
         end
       end
+      
+      def regex_match?(regex, index)
+        rx = @regexps[regex] ||= Regexp.new(regex)
+        if input.index(rx, index) == index
+          $&
+        else
+          nil
+        end
+      end
     
       def terminal_parse_failure(expected_string)
         return nil if index < max_terminal_failure_index
