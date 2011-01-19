@@ -3,7 +3,10 @@ module Treetop
     class Regex < AtomicExpression
       def compile(address, builder, parent_expression = nil)
         super
-        rx = "%q(#{text_value[2..-2]})" # strip 'r(' and ')'
+        
+        # I really think there should be 4 slashes in that replacement string, but 6 works. Deeply weird
+        rx = text_value[2..-2].gsub("\\", "\\\\\\") # strip 'r(' and ')'
+        rx = "%(#{rx})" 
         
         builder.if__ "(rx_match = regex_match?(#{rx}, index))" do
           assign_result "instantiate_node(#{node_class_name},input, index...(index + rx_match.length))"
@@ -11,7 +14,7 @@ module Treetop
           builder << "@index += rx_match.length"
         end
         builder.else_ do
-          builder << "terminal_parse_failure('r(' + #{rx} + ')')"
+          builder << "terminal_parse_failure('/' + #{rx} + '/')"
           assign_result 'nil'
         end
       end
